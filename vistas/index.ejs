@@ -79,6 +79,8 @@ async function SetRegistration() {
 	    {
 	    	document.getElementById("msg1").style.display = "none";
 		    message(0, `Registro Realizado correctamente ${nombre} ${apellido}`, true);
+		    document.getElementById("correo2").value = correo;
+		    document.getElementById("contra2").value = password;
 		    document.getElementById("miformulario").reset();
 		    FtcRL(1);
 	    }
