@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Pacifico">
+	<title>Entrar</title>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<div id="menu" class="menutab">
+				<ul>
+					<li  onclick="FtcRL(1)">Ingresar</li>
+					<li  onclick="FtcRL(2)">Registrar</li>
+				</ul>
+			</div>
+		</div>
+		<div class="container_2">
+			<div id="reg" class="card" style="display:none;">
+				<h2>Registro</h2>
+				<div id="msg1" class="messsage" style="display:none;">
+					Se ha registrado correctamente.
+				</div>
+				<form id="miformulario">
+					<label for="nombre">Nombre: </label>
+					<input type="text" id="nombre" name="">
+					<label for="apellido">Apellido: </label>
+					<input type="text" id="apellido" name="">
+					<label for="apellido">Correo: </label>
+					<input type="text" id="correo" name="">
+					<label for="contra">Contraseña: </label>
+					<input type="password" id="contra" name="">
+					<input type="button" name="" value="Registrarse" onclick="SetRegistration()">
+				</form>
+			</div>
+			<div id="ing" class="card">
+				<h2>Entrar</h2>
+				<div id="msg" class="messsage" style="display:none;">
+					Se ha registrado correctamente.
+				</div>
+				<form id="miformulario2" action="/productos" method="post">
+					<label for="correo2">Correo: </label>
+					<input type="text" id="correo2" name="">
+					<label for="contra2">Contraseña: </label>
+					<input type="password" id="contra2" name="">
+					<input type="button" name="" value="Ingresar" onclick="SetLogin()">
+				</form>
+			</div>
+			</div>
+		</div>
+
+	</div>
+<script type="text/javascript">
+async function SetRegistration() {
+	let nombre = document.getElementById("nombre").value;
+	let apellido = document.getElementById("apellido").value;
+	let correo = document.getElementById("correo").value;
+	correo = correo.toLowerCase();
+	let password = document.getElementById("contra").value;
+	if(!ValirdarCorreo(correo)){
+		message(1, 'El correo electrononico ingresado es invalido', false);
+		return 0;
+	}
+  try {
+
+		const response0 = await axios.get(`http://localhost:3000/comprobar_user/${correo}`);
+    if(response0.data.success == true)
+    {
+			const response1 = await axios.post('http://localhost:3000/registrar',{
+	    	nombre,
+	    	apellido,
+	    	correo,
+	    	password
+	    });
+	    if(response1.data.success == true)
+	    {
+	    	document.getElementById("msg1").style.display = "none";
+		    message(0, `Registro Realizado correctamente ${nombre} ${apellido}`, true);
+		    document.getElementById("miformulario").reset();
+		    FtcRL(1);
+	    }
+    }
+    else{
+			message(1, `El correo ${correo} Ya esta registrado.`, false);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+function message(opt, text, v){
+	let mensaje = opt==1 ? ("msg1"):("msg");
+	var documento = document.getElementById(mensaje);
+	documento.textContent = text;
+	documento.style.display = "block";
+	if(v == false) documento.style.boxShadow = "1px 1px 5px 6px rgba(255,0,0,0.3)"; 
+	else documento.style.boxShadow = "1px 1px 5px 6px rgba(0,143,57,0.3)";
+}
+async function SetLogin(){
+	let correo = document.getElementById("correo2").value;
+	correo = correo.toLowerCase();
+	let password = document.getElementById("contra2").value;
+	try{
+			const response01 = await axios.post('http://localhost:3000/login',{
+		  correo,
+		  password
+		});
+			console.log(response01);
+		if(response01.data.success == false){
+			message(0, response01.data.message, false);
+
+		}else{
+			window.location.href = '/productos/'+response01.data.token;
+		}
+
+	}catch(error){
+		console.error(error);
+
+	}
+}
+function FtcRL(vare){
+	let varsinho = (vare == 1)?(document.getElementById("ing")):((vare == 2)?(document.getElementById("reg")):(0));
+	let varsinho2 = (vare == 1)?(document.getElementById("reg")):((vare == 2)?(document.getElementById("ing")):(0));
+	if(varsinho.style.display == "none"){
+		varsinho2.style.display ="none"
+		varsinho.style.display ="block"
+		document.getElementById("msg1").style.display = "none";
+	}else if(varsinho2.style.display == "none"){
+		varsinho.style.display ="none"
+		varsinho.style.display ="block"
+		document.getElementById("msg").style.display = "none";
+	}
+		
+}
+function ValirdarCorreo(string){
+	if(string.length >= 10 && string.length <= 60){
+		if(string.indexOf("@") >= 3 && string.indexOf("@") <= string.length-5){
+			return true;
+		}
+	}
+	return false;
+}
+</script>
+</body>
+
+</html>
